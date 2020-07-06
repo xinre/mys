@@ -23,7 +23,9 @@ const channel: channelType = () => {
   }
 }
 
+const livingChan = channel()
+
 
 function test () {
-  
+
 }
