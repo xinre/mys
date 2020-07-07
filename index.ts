@@ -13,6 +13,7 @@ const channel: channelType = () => {
     if (taker) {
       const nowTaker = taker
       taker = null
+      console.log(agu)
       nowTaker(agu)
     }
   }
@@ -33,13 +34,15 @@ const take = (): { type: string } => {
 
 function* mainSaga (): IterableIterator<any> {
   const action = yield take()
+  console.log(action, '000')
 }
 
 const task = (iterator: () => IterableIterator<any>): void => {
   const iterVariable = iterator()
 
-  function next(args) {
+  function next(args?:any): void {
     const result = iterVariable.next(args)
+    console.log(args, result, 'pppp')
     if (!result.done) {
       const effect = result.value
       if (effect.type === 'take') {
@@ -47,13 +50,16 @@ const task = (iterator: () => IterableIterator<any>): void => {
       }
     }
   }
+  next()
 }
 
 function runTakeEffect(next: (args?: any) => void) {
   livingChan.take(input => {
     next(input)
-  });
+  })
 }
+
+task(mainSaga)
 
 
 
@@ -63,3 +69,5 @@ function test () {
   const action =`action${count++}`
   livingChan.put(action)
 }
+
+test()
