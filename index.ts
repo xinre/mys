@@ -32,9 +32,34 @@ const take = (): { type: string } => {
   }
 }
 
+function* takeEvery(worker) {
+  yield fork(function* () {
+    while(true) {
+      const action = yield take()
+      worker(action)
+    }
+  })
+}
+
+function fork(cb) {
+  return {
+    type: 'fork',
+    fn: cb,
+  };
+}
+
+function runForkEffect(effect, cb) {
+  task(effect.fn || effect)
+  cb()
+}
+
+
 function* mainSaga (): IterableIterator<any> {
-  const action = yield take()
-  console.log(action, '000')
+  // const action = yield take()
+  // console.log(action, '000')
+  yield takeEvery(action => {
+    console.log(action, '66666')
+  })
 }
 
 const task = (iterator: () => IterableIterator<any>): void => {
@@ -45,8 +70,18 @@ const task = (iterator: () => IterableIterator<any>): void => {
     console.log(args, result, 'pppp')
     if (!result.done) {
       const effect = result.value
-      if (effect.type === 'take') {
-        runTakeEffect(next)
+      if (typeof effect[Symbol.iterator] === 'function') {
+        runForkEffect(effect, next)
+      } else if (effect.type) {
+        switch (effect.type) {
+        case 'take':
+          runTakeEffect(next)
+          break
+        case 'fork':
+          runForkEffect(effect, next)
+          break
+        default:
+        }
       }
     }
   }
