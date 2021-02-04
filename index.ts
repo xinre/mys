@@ -13,7 +13,7 @@ const channel: channelType = () => {
     if (taker) {
       const nowTaker = taker
       taker = null
-      console.log(agu)
+      console.log(agu, 'put')
       nowTaker(agu)
     }
   }
@@ -55,19 +55,20 @@ function runForkEffect(effect, cb) {
 
 
 function* mainSaga (): IterableIterator<any> {
-  // const action = yield take()
-  // console.log(action, '000')
-  yield takeEvery(action => {
-    console.log(action, '66666')
-  })
+  const action = yield take()
+  console.log(action, '000')
+  // yield takeEvery(action => {
+  //   console.log(action, '66666')
+  // })
 }
 
 const task = (iterator: () => IterableIterator<any>): void => {
   const iterVariable = typeof iterator === 'function' && iterator()
+  let a = '****'
 
   function next(args?:any): void {
     const result = iterVariable.next(args)
-    console.log(args, result, 'pppp')
+    console.log(args, result, 'pppp', iterVariable)
     if (!result.done) {
       const effect = result.value
       if (typeof effect[Symbol.iterator] === 'function') {
@@ -86,10 +87,11 @@ const task = (iterator: () => IterableIterator<any>): void => {
     }
   }
 
-  iterVariable && next()
+  next()
 }
 
 function runTakeEffect(next: (args?: any) => void) {
+  console.log(next, '====')
   livingChan.take(input => {
     next(input)
   })
