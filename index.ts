@@ -63,7 +63,7 @@ function* mainSaga (): IterableIterator<any> {
 }
 
 const task = (iterator: () => IterableIterator<any>): void => {
-  const iterVariable = iterator()
+  const iterVariable = typeof iterator === 'function' && iterator()
 
   function next(args?:any): void {
     const result = iterVariable.next(args)
@@ -85,7 +85,8 @@ const task = (iterator: () => IterableIterator<any>): void => {
       }
     }
   }
-  next()
+
+  iterVariable && next()
 }
 
 function runTakeEffect(next: (args?: any) => void) {

@@ -48,7 +48,7 @@ function* mainSaga() {
     });
 }
 const task = (iterator) => {
-    const iterVariable = iterator();
+    const iterVariable = typeof iterator === 'function' && iterator();
     function next(args) {
         const result = iterVariable.next(args);
         console.log(args, result, 'pppp');
@@ -70,7 +70,7 @@ const task = (iterator) => {
             }
         }
     }
-    next();
+    iterVariable && next();
 };
 function runTakeEffect(next) {
     livingChan.take(input => {
